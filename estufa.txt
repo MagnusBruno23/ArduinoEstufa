@@ -1,0 +1,83 @@
+#include <LiquidCrystal.h>
+#include <SoftwareSerial.h>
+
+#define sensor_cortina A0
+#define l_temperatura A1
+
+#define cortina_on 2
+#define cortina_off 3
+
+#define exaustor_on 4
+#define exaustor_off 5
+
+#define comporta_on 6
+#define comporta_off 7
+
+LiquidCrystal termometro(8,9,10,11,12,13);
+
+
+int luz;
+int temperatura;
+float v_temperatura;  
+
+
+void setup() {
+  termometro.begin(16,2);
+  Serial.begin(9600);
+  termometro.setCursor(0,0);
+  termometro.print("SENAI");
+  termometro.setCursor(0,1);
+  termometro.print("Estufa");
+ 
+  pinMode(cortina_on, OUTPUT);
+  pinMode(cortina_off, OUTPUT);
+  pinMode(exaustor_on, OUTPUT);
+  pinMode(exaustor_off, OUTPUT);
+  pinMode(comporta_on, OUTPUT);
+  pinMode(comporta_off, OUTPUT);
+
+  Serial.begin(9600);
+}
+
+
+void loop() {
+  //leitura luminosidade
+  luz = analogRead(sensor_cortina);
+ 
+  if(luz<=800){
+    digitalWrite(cortina_on, HIGH);
+    digitalWrite(cortina_off, HIGH);
+  }
+  else{
+    digitalWrite(cortina_on, LOW);
+    digitalWrite(cortina_off, LOW);
+  }
+
+  //leitura temperatura
+  temperatura = analogRead(l_temperatura);
+
+  if(temperatura>=818){
+    digitalWrite(exaustor_on, LOW);
+    digitalWrite(exaustor_off, LOW);
+    digitalWrite(comporta_on, LOW);
+    digitalWrite(comporta_off, LOW);
+  }
+  else if(temperatura>=736){
+    digitalWrite(exaustor_on, HIGH);
+    digitalWrite(exaustor_off, HIGH);
+  }
+  else{
+    digitalWrite(exaustor_on, LOW);
+    digitalWrite(exaustor_off, LOW);
+    digitalWrite(comporta_on, HIGH);
+    digitalWrite(comporta_off, HIGH);
+  }
+  
+
+  v_temperatura = temperatura * (25.0/1023.0) + 25.0;
+  
+  termometro.clear();
+  termometro.setCursor(8,0);
+  termometro.print(v_temperatura);
+  delay(100);
+}
